@@ -1,5 +1,7 @@
 "redis-import-set"
 import sys
+from csv import reader
+from itertools import groupby
 
 import redis
 
@@ -13,8 +15,9 @@ def handle():
     except IndexError:
         raise Exception("You must specify the name for the Set")
 
-    for line in sys.stdin:
-        pipeline_redis.sadd(keyname, line.rstrip())
+    for member, _ in groupby(reader(sys.stdin, delimiter='\t'),
+    	                    lambda x:x[0]):
+        pipeline_redis.sadd(keyname, member.rstrip())
         count += 1
         if not count % 10000:
             pipeline_redis.execute()
