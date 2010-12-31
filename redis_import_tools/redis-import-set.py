@@ -1,13 +1,10 @@
-# redis-import-set
-import fileinput
+"redis-import-set"
 import sys
-from itertools import count, islice
 
 import redis
 
 
-if __name__ == '__main__':
-	
+def handle():
     r = redis.Redis()
     pipeline_redis = r.pipeline()
     count = 0
@@ -17,9 +14,13 @@ if __name__ == '__main__':
         raise Exception("You must specify the name for the Set")
 
     for line in sys.stdin:
-        pipeline_redis.sadd(keyname, line)
+        pipeline_redis.sadd(keyname, line.rstrip())
         count += 1
         if not count % 10000:
-        	pipeline_redis.execute()
+            pipeline_redis.execute()
+    pipeline_redis.execute()
 
+
+if __name__ == '__main__':
+    handle()
 
