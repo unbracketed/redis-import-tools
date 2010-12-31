@@ -1,5 +1,4 @@
 # redis-import-set
-import fileinput
 import sys
 from csv import reader
 from itertools import count, groupby, islice
