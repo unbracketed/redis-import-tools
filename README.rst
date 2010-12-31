@@ -90,6 +90,16 @@ About Filtering, Sorting, and Compression...
 
 Often you will be starting with an input set that contains extraneous data (columns and/or rows you won't need). 
 
+The performance characteristics of these data processing steps can vary depending on where they are handled. For example, 
+the Python ZipFile streaming appeared to add significant overhead under scenarios I tested. I may add some basic fallbacks
+for decompressing the input source in the future and I'm also deciding what features in general I might want to support for I/O with
+compressed/archive data formats. Since decompressing data is always
+a first operation it easiest just to rely on the native OS compression tools and allow the redis-import-tools commands to 
+assume (uncompressed) textual input.
+
+Python CSV seems to add a minimal amount of overhead so leaving it in is worthwhile since it probably more robust than
+naively using ``string.split()``
+
 
 
 
