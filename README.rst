@@ -6,12 +6,18 @@ A collection of utilities for importing data into Redis
 Commands
 --------
 
-* redis-import-set
+redis-import-set
+    Create a Redis Set from a column of values in a text file
+
 
 Installation
 ------------
 
-pip install redis-import-tools
+It is assumed that you have Redis version >= 1.3 installed and configured.
+
+::
+
+    pip install redis-import-tools
 
 
 Introduction
@@ -22,8 +28,8 @@ Let's start with a trivial example. We'd like to load our local words dictionary
     $ cat /usr/share/dict/words \
     | xargs -d "\n" -I word redis-cli sadd engdict word  > /dev/null
 
-We're piping the contents of the dictionary file to xargs, which will run an ``SADD`` command for each
-word in the dictionary and add it to a set called *engdict*
+We're piping the contents of the dictionary file to `xargs`, which will run an ``SADD`` command for each
+word in the dictionary and add it to a set called ``engdict``.
 
 While the one-liner is nice, performance was terrible::
 
@@ -63,7 +69,7 @@ With code like the following, we can send data to Redis in batches (10000 values
             pipeline_redis.execute()
     pipeline_redis.execute()
 
-This code is the basic idea for the redis-import-set command. We can use it to perform the desired operation::
+This code is the basic idea for the redis-import-set command. Here's how to use the command to perform the desired operation::
 
     $ redis-import-set engdict < /usr/share/dict/words
 
@@ -73,7 +79,7 @@ Performance is now very acceptable::
     user    0m2.530s
     sys     0m0.050s
 
-And the set count matches the input count :)::
+And the set count matches the input count::
 
     redis> scard engdict
     (integer) 98569
