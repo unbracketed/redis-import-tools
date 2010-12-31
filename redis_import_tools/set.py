@@ -15,12 +15,15 @@ def handle():
     except IndexError:
         raise Exception("You must specify the name for the Set")
 
+    seen = set()
     for member, _ in groupby(reader(sys.stdin, delimiter='\t'),
     	                    lambda x:x[0]):
-        pipeline_redis.sadd(keyname, member.rstrip())
-        count += 1
-        if not count % 10000:
-            pipeline_redis.execute()
+        if member not in seen:
+            pipeline_redis.sadd(keyname, member.rstrip())
+            count += 1
+            seen.add(member)
+            if not count % 10000:
+                pipeline_redis.execute()
     pipeline_redis.execute()
 
 
