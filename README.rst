@@ -101,5 +101,73 @@ Python CSV seems to add a minimal amount of overhead so leaving it in is worthwh
 naively using ``string.split()``
 
 
+Case Study
+----------
 
 
+Using the corpus of English 1-grams from Google Books: TODO
+
+The first archive contains 29232733 rows of which 420044 are unique. 
+
+Extract the first column into a file which we'll later use as input redis-import-set::
+
+    $ time unzip -p googlebooks-eng-us-all-1gram-20090715-0.csv.zip | cut -f 1 | uniq > eng-us-all-1gram-0-uniq-grams
+
+    real    0m12.706s
+    user    0m15.820s
+    sys     0m1.460s
+
+
+Import as a set::
+
+    $ time redis-import-set 1g < eng-us-all-1gram-0-uniq-grams
+
+    real    0m12.995s
+    user    0m11.130s
+    sys     0m0.120s
+
+Let's see how it fares if the input has duplicates::
+
+    $ time unzip -p googlebooks-eng-us-all-1gram-20090715-0.csv.zip | cut -f 1 | uniq > eng-us-all-1gram-0-uniq-grams
+    $ time redis-import-set 1g < eng-us-all-1gram-0-grams
+
+    real    0m31.068s
+    user    0m28.910s
+    sys     0m0.160s
+
+Internally redis-import-set is using ``itertools.groupby`` to avoid sending redundant ``SADD`` operations for repeated
+entries. 
+
+Here is for just using the raw CSV file, taking advantage of the redis-import-set behavior to default to the 
+first column::
+
+    real    0m39.420s
+    user    0m37.200s
+    sys     0m0.360s
+
+What happens if we try to process unsorted data with many duplicates? The groupby filter won't have any effect::
+
+    $ time unzip -p googlebooks-eng-us-all-1gram-20090715-0.csv.zip | cut -f 2 > eng-us-all-1gram-0-years
+
+    real    0m14.114s
+    user    0m13.190s
+    sys     0m1.320s
+
+    $ time redis-import-set years < eng-us-all-1gram-0-years
+
+    real    13m50.783s
+    user    12m39.700s
+    sys     0m4.450s
+
+Ouch! This is problematic. However, we can still workaround this by using a Python Set internally to track which
+items we've already sent to ``SADD``. After making this change, we have::
+
+    time redis-import-set years < eng-us-all-1gram-0-years
+
+    real    0m26.108s
+    user    0m25.970s
+    sys     0m0.060s
+
+Back in business. For many inputs the distinct count may be a small percentage of the total inputs but otherwise
+it won't be desirable to be automatically cache set members in the command. A forthcoming change will require
+use of a command line argument to signify that the input is unsorted and to utilize the cache. 
