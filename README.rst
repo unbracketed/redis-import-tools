@@ -128,7 +128,7 @@ Import as a set::
 
 Let's see how it fares if the input has duplicates::
 
-    $ time unzip -p googlebooks-eng-us-all-1gram-20090715-0.csv.zip | cut -f 1 | uniq > eng-us-all-1gram-0-uniq-grams
+    $ googlebooks-eng-us-all-1gram-20090715-0.csv.zip | cut -f 0 > eng-us-all-1gram-0-grams
     $ time redis-import-set 1g < eng-us-all-1gram-0-grams
 
     real    0m31.068s
@@ -138,20 +138,30 @@ Let's see how it fares if the input has duplicates::
 Internally redis-import-set is using ``itertools.groupby`` to avoid sending redundant ``SADD`` operations for repeated
 entries. 
 
-Here is for just using the raw CSV file, taking advantage of the redis-import-set behavior to default to the 
+Here is for just using the raw CSV file, taking advantage of the `redis-import-set` behavior to default to the 
 first column::
 
     real    0m39.420s
     user    0m37.200s
     sys     0m0.360s
 
-What happens if we try to process unsorted data with many duplicates? The groupby filter won't have any effect::
+This is good considering that the input size of the input with duplicates is 70x bigger yet the execution time only tripled
+from the unique inputs case.
 
+What happens if we try to process unsorted data with many duplicates? The groupby filter won't have any effect
+and consequently we'll be sending many more requests than needed, containing mostly redundant data. To illustrate
+we'll cut the years column out of the corpus file giving us a huge input count containing only a few hundred 
+distinct values::
+
+    # Slice out the years column from the corpus
     $ time unzip -p googlebooks-eng-us-all-1gram-20090715-0.csv.zip | cut -f 2 > eng-us-all-1gram-0-years
 
     real    0m14.114s
     user    0m13.190s
     sys     0m1.320s
+
+    $ wc -l eng-us-all-1gram-0-years
+    29232733
 
     $ time redis-import-set years < eng-us-all-1gram-0-years
 
