@@ -117,8 +117,10 @@ Extract the first column into a file which we'll later use as input redis-import
     user    0m15.820s
     sys     0m1.460s
 
-
-Import as a set::
+    $ wc -l eng-us-all-1gram-0-uniq-grams 
+    420044 eng-us-all-1gram-0-uniq-grams
+       
+Import to a Redis set called ``1g``::
 
     $ time redis-import-set 1g < eng-us-all-1gram-0-uniq-grams
 
@@ -135,11 +137,17 @@ Let's see how it fares if the input has duplicates::
     user    0m28.910s
     sys     0m0.160s
 
+    $ wc -l eng-us-all-1gram-0-grams 
+    29232733 eng-us-all-1gram-0-grams
+
 Internally redis-import-set is using ``itertools.groupby`` to avoid sending redundant ``SADD`` operations for repeated
 entries. 
 
 Here is for just using the raw CSV file, taking advantage of the `redis-import-set` behavior to default to the 
 first column::
+
+    $ unzip googlebooks-eng-us-all-1gram-20090715-0.csv.zip
+    $ redis-import-set 1g < googlebooks-eng-us-all-1gram-20090715-0.csv
 
     real    0m39.420s
     user    0m37.200s
