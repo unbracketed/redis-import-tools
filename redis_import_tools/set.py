@@ -15,9 +15,9 @@ def handle():
     except IndexError:
         raise Exception("You must specify the name for the Set")
 
-    seen = set()
+    seen = set([None])
     for member, _ in groupby(reader(sys.stdin, delimiter='\t'),
-    	                    lambda x:x[0]):
+    	                    lambda x:x[0] if len(x) else None):
         if member not in seen:
             pipeline_redis.sadd(keyname, member.rstrip())
             count += 1
