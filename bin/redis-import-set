@@ -4,7 +4,11 @@ import argparse
 
 
 parser = argparse.ArgumentParser(description='Tools for importing data into Redis.')
-parser.add_argument('-u', '--unsorted', action="store_true")
-parser.add_argument('key')
+parser.add_argument('-b', '--batch-size', default=10000,
+        help='number of SADD operations to send per pipeline batch')
+#parser.add_argument('-u', '--unsorted', action="store_true",
+#        help='indicates that the input is unsorted')
+parser.add_argument('key',
+        help='name of the key for the set')
 options = parser.parse_args()
-importset.handle(key=options.key)
+importset.handle(key=options.key, batch_size=options.batch_size)
