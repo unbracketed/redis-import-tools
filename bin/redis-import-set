@@ -1,5 +1,14 @@
 #!/usr/bin/env python
 from redis_import_tools import commands
-if __name__ == '__main__':
+import argparse
 
-    commands.import_set()
+
+parser = argparse.ArgumentParser(description='Tools for importing data into Redis.')
+parser.add_argument('-b', '--batch-size', default=10000,
+        help='number of SADD operations to send per pipeline batch')
+#parser.add_argument('-u', '--unsorted', action="store_true",
+#        help='indicates that the input is unsorted')
+parser.add_argument('key',
+        help='name of the key for the set')
+options = parser.parse_args()
+commands.import_set(key=options.key, batch_size=options.batch_size)
