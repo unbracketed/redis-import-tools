@@ -1,3 +1,5 @@
 #!/usr/bin/env python
-from redis_import_tools import set
-set.handle()
+from redis_import_tools import commands
+if __name__ == '__main__':
+
+    commands.import_set()

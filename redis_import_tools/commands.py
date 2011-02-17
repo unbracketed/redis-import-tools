@@ -7,8 +7,11 @@ import redis
 
 
 def handle():
+    #import pdb; pdb.set_trace()
     r = redis.Redis()
+    print redis.__path__
     pipeline_redis = r.pipeline()
+
     count = 0
     try:
         keyname = sys.argv[1]
@@ -27,6 +30,6 @@ def handle():
     pipeline_redis.execute()
 
 
-if __name__ == '__main__':
-    handle()
+#if __name__ == '__main__':
+    #handle()
 
