@@ -6,7 +6,7 @@ from itertools import groupby
 import redis
 
 
-def import_set():
+def import_set(**kwargs):
     r = redis.Redis()
     pipeline_redis = r.pipeline()
     count = 0
@@ -24,8 +24,3 @@ def import_set():
                 pipeline_redis.execute()
     #send the last batch
     pipeline_redis.execute()
-
-
-#if __name__ == '__main__':
-    #handle()
-
