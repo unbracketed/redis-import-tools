@@ -6,10 +6,8 @@ from itertools import groupby
 import redis
 
 
-def handle():
-    #import pdb; pdb.set_trace()
+def import_set():
     r = redis.Redis()
-    print redis.__path__
     pipeline_redis = r.pipeline()
 
     count = 0
