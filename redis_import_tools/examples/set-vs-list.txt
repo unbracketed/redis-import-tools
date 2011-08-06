@@ -1,0 +1,18 @@
+List import twice as fast as set:
+
+brian@airtank:~/work/gamesradar/gamesradar/gamesradar$ time redis-import-set set test2 < /tmp/activity_i
+ds.txt
+
+real    4m5.133s
+user    3m44.330s
+sys     0m1.730s
+brian@airtank:~/work/gamesradar/gamesradar/gamesradar$ time redis-import-set list testlist < /tmp/activi
+ty_ids.txt
+
+real    2m10.471s
+user    1m57.740s
+sys     0m1.820s
+brian@airtank:~/work/gamesradar/gamesradar/gamesradar$ redis-cli scard test2
+(integer) 4617374
+brian@airtank:~/work/gamesradar/gamesradar/gamesradar$ redis-cli llen testlist
+(integer) 4617374
