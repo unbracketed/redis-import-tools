@@ -1,10 +1,13 @@
 #!/usr/bin/env python
-from redis_import_tools import commands
 import argparse
+import sys
+
+from redis_import_tools import commands
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Tools for importing data into Redis.')
+    parser = argparse.ArgumentParser(
+            description='Tools for importing data into Redis.')
 
     parser.add_argument('-b', '--batch-size', default=10000,
             help='number of SADD operations to send per pipeline batch')
@@ -13,14 +16,14 @@ if __name__ == '__main__':
     #        help='indicates that the input is unsorted')
 
     parser.add_argument('cmd',
-            help='name of the key for the set')
+            help='Redis command')
     parser.add_argument('key',
-            help='name of the key for the set')
+            help='name of the key for the command')
 
     options = parser.parse_args()
 
     cmd = options.cmd
     if cmd == 'set':
-        commands.import_set(key=options.key, batch_size=options.batch_size)
+        commands.load_set(sys.stdin, key=options.key, batch_size=options.batch_size)
     elif cmd == 'list':
-        commands.import_list(key=options.key, batch_size=options.batch_size)
+        commands.load_list(sys.stdin, key=options.key, batch_size=options.batch_size)
