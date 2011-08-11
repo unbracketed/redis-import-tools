@@ -24,6 +24,6 @@ if __name__ == '__main__':
 
     cmd = options.cmd
     if cmd == 'set':
-        commands.load_set(sys.stdin, key=options.key, batch_size=options.batch_size)
+        commands.load_set(options.key, sys.stdin, batch_size=options.batch_size)
     elif cmd == 'list':
-        commands.load_list(sys.stdin, key=options.key, batch_size=options.batch_size)
+        commands.load_list(options.key, sys.stdin, batch_size=options.batch_size)
