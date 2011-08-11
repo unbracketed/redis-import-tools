@@ -43,3 +43,20 @@ def load_list(key, IN, **kwargs):
             pipeline_redis.execute()
     #send the last batch
     pipeline_redis.execute()
+
+
+def load_hash_list(IN, **kwargs):
+    """
+    """
+    r = redis.Redis()
+    pipeline_redis = r.pipeline()
+    count = 0
+    batch_size = kwargs.get('batch_size', 1000)
+
+    for key, mapping in IN:
+        pipeline_redis.hmset(key, mapping)
+        count += 1
+        if not count % batch_size:
+            pipeline_redis.execute()
+    #send the last batch
+    pipeline_redis.execute()
